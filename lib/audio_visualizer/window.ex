@@ -54,9 +54,7 @@ defmodule AudioVisualizer.Window do
   end
 
   def do_draw(data_agent, dc) do
-    canvas = :wxGraphicsContext.create(dc)
-    :wxPaintDC.clear(dc)
-    AudioVisualizer.Renderer.render(canvas, Agent.get(data_agent, fn(data) ->
+    AudioVisualizer.Renderer.render(dc, Agent.get(data_agent, fn(data) ->
       Enum.take(data, 16_000)
     end))
     :timer.sleep(10)

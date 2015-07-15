@@ -3,29 +3,42 @@ defmodule AudioVisualizer.Renderer do
   @resolution 16
   @multiplier 3
 
-  def render(canvas, data) do
-    draw_lines(canvas, Enum.with_index(data))
+  def render(dc, data) do
+    canvas = :wxGraphicsContext.create(dc)
+    draw_lines(canvas, dc, Enum.with_index(data))
   end
 
-  def draw_lines(canvas, [head|rest]) do
-    draw_line(canvas, head)
-    draw_lines(canvas, rest)
+  def draw_lines(canvas, dc, data) do
+    sampled_data = sample(data)
+    do_draw_lines(canvas, dc, points(sampled_data))
   end
-  def draw_lines(canvas, []), do: :ok
 
-  def draw_line(canvas, {amplitude, position}) do
+  def sample(data) do
+    sample(data, [])
+  end
+  def sample([{amplitude, position}|rest], acc) do
     case rem(position, @resolution) do
       0 ->
-        pen = :wxPen.new({255, 0, 0, 255})
-        x = 0 + position/@resolution
-        :wxGraphicsContext.setPen(canvas, pen)
-        :wxGraphicsContext.drawLines(canvas, [
-          {x, @center_y},
-          {x, @center_y + (-128 + amplitude) * @multiplier}
-        ])
+        sample(rest, [{amplitude, position}|acc])
       _ ->
-        :ok
+        sample(rest, acc)
     end
-    :ok
+  end
+  def sample([], acc), do: Enum.reverse(acc)
+
+  def points(sampled_data) do
+    Enum.map(sampled_data, fn({amplitude, position}) ->
+      x = 0 + position/@resolution
+      y = -128 + amplitude * @multiplier
+      {x, @center_y + y}
+    end)
+  end
+
+  def do_draw_lines(_canvas, _dc, []), do: :ok
+  def do_draw_lines(canvas, dc, points) do
+    :wxPaintDC.clear(dc)
+    pen = :wxPen.new({255, 0, 0, 255})
+    :wxGraphicsContext.setPen(canvas, pen)
+    :wxGraphicsContext.drawLines(canvas, points)
   end
 end
