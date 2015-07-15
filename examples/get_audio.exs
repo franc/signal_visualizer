@@ -2,7 +2,7 @@
 
 defmodule AudioReceiver do
   def start(data_agent) do
-    Port.open({:spawn, "parec --rate=16000 --format=u8 -n 'alsa_input.usb-BLUE_MICROPHONE_Blue_Snowball_201306-00-Snowball.analog-stereo'"}, [])
+    Port.open({:spawn, "parec --rate=16000 --format=u8"}, [])
     loop(data_agent)
   end
 
