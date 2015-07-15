@@ -1,9 +1,9 @@
-defmodule AudioRenderer.Window do
+defmodule AudioVisualizer.Window do
   @moduledoc """
   A window to draw our audio renderer within.
   """
 
-  @title 'Audio Renderer'
+  @title 'Audio Visualizer'
 
   require Record
   Record.defrecordp :wx, Record.extract(:wx, from_lib: "wx/include/wx.hrl")
@@ -12,15 +12,15 @@ defmodule AudioRenderer.Window do
   Record.defrecordp :wxKey, Record.extract(:wxKey, from_lib: "wx/include/wx.hrl")
   Record.defrecordp :wxPaint, Record.extract(:wxPaint, from_lib: "wx/include/wx.hrl")
 
-  def start(data) do
-    do_init(data)
+  def start(data_agent) do
+    do_init(data_agent)
   end
 
-  def init(data) do
-    :wx.batch(fn() -> do_init(data) end)
+  def init(data_agent) do
+    :wx.batch(fn() -> do_init(data_agent) end)
   end
 
-  def do_init(data) do
+  def do_init(data_agent) do
     wx = :wx.new
     frame = :wxFrame.new(wx, -1, @title, size: {1000, 1000})
     panel = :wxPanel.new(frame, [])
@@ -41,7 +41,7 @@ defmodule AudioRenderer.Window do
       after 100 -> # Have to wait for a little for the window to exist
                    # before creating the drawing context
         dc = :wxPaintDC.new(win)
-        draw(data, dc)
+        draw(data_agent, dc)
     end
     receive do
       :ok -> :ok
@@ -49,14 +49,17 @@ defmodule AudioRenderer.Window do
     :wxPaintDC.destroy(dc)
   end
 
-  def draw(data, dc) do
-    do_draw(data, dc)
+  def draw(data_agent, dc) do
+    do_draw(data_agent, dc)
   end
 
-  def do_draw(data, dc) do
+  def do_draw(data_agent, dc) do
     canvas = :wxGraphicsContext.create(dc)
-    AudioVisualizer.Renderer.render(canvas, data)
-    :timer.sleep(100)
-    do_draw(data, dc)
+    :wxPaintDC.clear(dc)
+    AudioVisualizer.Renderer.render(canvas, Agent.get(data_agent, fn(data) ->
+      Enum.take(data, 16_000)
+    end))
+    :timer.sleep(10)
+    do_draw(data_agent, dc)
   end
 end
