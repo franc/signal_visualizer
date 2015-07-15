@@ -1,6 +1,7 @@
 defmodule AudioVisualizer.Renderer do
-  @center_y 100
-  @resolution 100
+  @center_y 500
+  @resolution 16
+  @multiplier 3
 
   def render(canvas, data) do
     draw_lines(canvas, Enum.with_index(data))
@@ -20,7 +21,7 @@ defmodule AudioVisualizer.Renderer do
         :wxGraphicsContext.setPen(canvas, pen)
         :wxGraphicsContext.drawLines(canvas, [
           {x, @center_y},
-          {x, @center_y + (-128 + amplitude)}
+          {x, @center_y + (-128 + amplitude) * @multiplier}
         ])
       _ ->
         :ok
