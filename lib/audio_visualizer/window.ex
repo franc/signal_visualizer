@@ -22,7 +22,7 @@ defmodule AudioVisualizer.Window do
 
   def do_init(data_agent) do
     wx = :wx.new
-    frame = :wxFrame.new(wx, -1, @title, size: {1000, 1000})
+    frame = :wxFrame.new(wx, -1, @title, size: {500, 500})
     panel = :wxPanel.new(frame, [])
 
     main_sizer = :wxBoxSizer.new(:wx_const.wx_vertical)

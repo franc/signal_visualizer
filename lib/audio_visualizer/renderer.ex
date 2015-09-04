@@ -30,7 +30,7 @@ defmodule AudioVisualizer.Renderer do
     Enum.map(sampled_data, fn({amplitude, position}) ->
       x = 0 + position/@resolution
       y = -128 + amplitude * @multiplier
-      {x, @center_y + y}
+      {round(x), round(@center_y + y)}
     end)
   end
 

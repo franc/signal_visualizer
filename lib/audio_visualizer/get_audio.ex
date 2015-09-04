@@ -12,7 +12,7 @@ end
 
 defmodule AudioReceiver do
   def start(data_agent) do
-    Port.open({:spawn, "parec --rate=16000 --format=u8"}, [])
+    Port.open({:spawn, "sox -d -q -e unsigned-integer -b 8 -c 1 -t u8 -"}, [])
     loop(data_agent)
   end
 
