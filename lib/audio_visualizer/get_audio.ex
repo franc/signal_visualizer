@@ -21,6 +21,7 @@ defmodule AudioReceiver do
       {_, {:data, data}} ->
         Agent.update(data_agent, fn(existing_data) ->
           data ++ existing_data
+          |> Enum.take(16_000)
         end)
       other -> IO.inspect "got other: #{inspect other}"
     end
