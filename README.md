@@ -12,4 +12,9 @@ So this is starting out as a mix of those two projects, but I hope to use it to 
 
 
 
+```
+mix run examples/main.exs
+```
+
+
 
