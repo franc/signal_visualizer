@@ -3,11 +3,11 @@
 
 # This is from @sasajuric's library: pythaforas_tree
 
-defmodule AudioVisualizer.MainWindow do
+defmodule SignalVisualizer.Window do
   @behaviour :wx_object
 
   def start(title, opts) do
-    :wx_object.start(AudioVisualizer.MainWindow, {title, opts}, [])
+    :wx_object.start(SignalVisualizer.Window, {title, opts}, [])
   end
 
   def draw_lines(object, lines) do
@@ -16,13 +16,12 @@ defmodule AudioVisualizer.MainWindow do
   end
 
   def draw_points(object, points) do
-    #draw_lines(object, points_to_lines(points))
-    #IO.inspect points
-    #points_to_lines(points)
-    #|> Enum.chunk(2, 1)
-    #|> Enum.map(&(:wx_object.call(object, {:draw_lines, &1})))
-    :wx_object.call(object, {:draw_lines, points_to_lines(points)})
-    object
+    try do
+      :wx_object.call(object, {:draw_lines, points_to_lines(points)})
+      object
+    rescue
+      _ -> :error
+    end
   end
 
   def points_to_lines(points) do
@@ -58,8 +57,7 @@ defmodule AudioVisualizer.MainWindow do
   def handle_call({:draw_lines, lines}, _, state) do
     memory_dc = :wxMemoryDC.new(state.bitmap)
     dc = :wxClientDC.new(state.window)
-
-    IO.puts "handle_event"
+    :wxPaintDC.clear(memory_dc)
 
     for {from, to} <- lines do
       :wxDC.drawLine(memory_dc, from, to)
